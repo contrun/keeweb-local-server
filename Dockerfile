@@ -1,6 +1,5 @@
-FROM alpine:latest
+FROM alpine:3
 
-RUN apk update
 RUN apk add --no-cache php7-cli php7-json bash wget busybox
 
 ARG KEEWEB_VERSION

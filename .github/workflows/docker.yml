@@ -1,6 +1,15 @@
 name: docker container image
 
 on:
+  push:
+    branches:
+      - master
+      - main
+      - actions
+      - ci
+      - 'releases/*'
+  schedule:
+    - cron:  '0 10 * * *'
   workflow_dispatch: {}
 
 jobs:
@@ -16,6 +25,13 @@ jobs:
 
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v1
+
+    - name: Get latest keeweb release version
+      id: keeweb
+      run: |
+        set -xeuo pipefail
+        KEEWEB_VERSION="$(curl -sL https://api.github.com/repos/keeweb/keeweb/releases/latest | jq -r .tag_name | sed 's#^v##g' | xargs)"
+        echo "::set-output name=KEEWEB_VERSION::$KEEWEB_VERSION"
 
     - name: Get docker environment
       id: env
@@ -34,7 +50,7 @@ jobs:
         echo "::set-output name=DOCKER_IMAGE::$DOCKER_IMAGE"
         echo "::set-output name=DOCKER_IMAGE_LATEST::$DOCKER_IMAGE_LATEST"
         echo "::set-output name=DOCKER_IMAGE_CACHE::$DOCKER_IMAGE_CACHE"
-        echo "::set-output name=DOCKER_TAGS::$DOCKER_IMAGE,$DOCKER_IMAGE_LATEST"
+        echo "::set-output name=DOCKER_TAGS::$DOCKER_IMAGE,$DOCKER_IMAGE_LATEST,$DOCKER_HUB_URL:v${{ steps.keeweb.outputs.KEEWEB_VERSION }}"
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v1
@@ -49,6 +65,8 @@ jobs:
       id: docker_build
       uses: docker/build-push-action@v2
       with:
+        build-args: |
+          KEEWEB_VERSION=${{ steps.keeweb.outputs.KEEWEB_VERSION }}
         push: ${{ github.event_name != 'pull_request' }}
         platforms: linux/amd64,linux/arm64
         tags: ${{ steps.env.outputs.DOCKER_TAGS }}
