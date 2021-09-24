@@ -12,7 +12,7 @@ define("REQUIRE_PASSWORD_READING", true);
 define("BASE_PATH", __DIR__ . "/databases");
 
 function require_authorization() {
-    $valid_password = PASSWORD;
+    $valid_password = getenv("PASSWORD") ?: PASSWORD;
     if (empty($valid_password))
         return;
 
