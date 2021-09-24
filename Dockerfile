@@ -1,13 +1,14 @@
 FROM alpine:latest
 
 RUN apk update
-RUN apk add --no-cache php7-cli php7-json bash wget
+RUN apk add --no-cache php7-cli php7-json bash wget busybox
 
-# add files
-RUN mkdir /var/www
-ADD install.sh /var/www
-RUN cd /var/www/ && chmod +x install.sh && ./install.sh
+ARG KEEWEB_VERSION
+ENV KEEWEB_VERSION=${KEEWEB_VERSION:-1.18.7}
+WORKDIR /var/www/keeweb-local-server
+RUN wget -O- https://github.com/keeweb/keeweb/releases/download/v${KEEWEB_VERSION}/KeeWeb-${KEEWEB_VERSION}.html.zip | busybox unzip - && \
+    sed -i 's/content="(no-config)"/content="config.json"/' index.html
+ADD . /var/www/keeweb-local-server
 
 EXPOSE 8080
-WORKDIR /var/www/keeweb-local-server
 ENTRYPOINT ["php", "-S", "0.0.0.0:8080"]
