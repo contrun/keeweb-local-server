@@ -1,16 +1,16 @@
 {
   "settings": {
     "canOpen": true,
-    "canOpenDemo": false,
+    "canOpenDemo": true,
     "canOpenSettings": true,
-    "canCreate": false,
-    "canImportXml": false,
+    "canCreate": true,
+    "canImportXml": true,
     "canRemoveLatest": true,
 
-    "dropbox": false,
-    "webdav": false,
-    "gdrive": false,
-    "onedrive": false,
+    "dropbox": true,
+    "webdav": true,
+    "gdrive": true,
+    "onedrive": true,
     "localServerStorage": true
   },
   "plugins": [{
